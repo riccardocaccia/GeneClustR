@@ -1,0 +1,74 @@
+---
+title: "Esempio di Analisi Esplorativa"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Esempio di Analisi Esplorativa}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(GeneClustR)
+library(ggplot2)
+library(plotly)
+```
+
+Questa vignetta mostra come utilizzare la funzione explorative_analysis() per visualizzare e analizzare dati pre-processati di espressione genica.
+
+```{r}
+# Creazione matrice simulata
+set.seed(10)
+mat <- matrix(rnorm(200), nrow = 20, ncol = 10)
+rownames(mat) <- paste0("Gene", 1:20)
+colnames(mat) <- paste0("Sample", 1:10)
+
+# Preprocessing
+mat_prep <- preprocess(mat, normalize = TRUE, method = "log")
+
+# Cleaning: rimuove righe con NA/Inf e verifica che rimanga qualcosa
+finite_rows <- apply(mat_prep, 1, function(x) all(is.finite(x)))
+finite_rows[is.na(finite_rows)] <- FALSE  # evita NA
+
+mat_prep <- mat_prep[finite_rows, , drop = FALSE]
+
+# ⚠️ Check: la matrice non deve essere vuota
+if (nrow(mat_prep) == 0 || ncol(mat_prep) == 0) {
+  stop("La matrice pre-processata è vuota dopo la rimozione dei dati non finiti.")
+}
+
+mat_prep <- as.matrix(mat_prep)
+options(repr.plot.width = 10, repr.plot.height = 8)
+```
+
+heatmap
+
+```{r}
+results <- explorative_analysis(mat_prep, analysis_type = "CorrHeatmap")
+results$plot
+
+```
+
+PCA
+
+```{r}
+pca_out <- explorative_analysis(mat_prep, analysis_type = "pca")
+pca_out$plot
+```
+
+
+scatter
+
+```{r}
+explorative_analysis(mat_prep, analysis_type = "scatter", gene1 = "Gene1", gene2 = "Gene2")
+
+```
+
+LM e Q-Q plot
+
+```{r}
+# Nota: questo produce output base R, non ggplot
+explorative_analysis(mat_prep, analysis_type = "lm", gene1 = "Gene1", gene2 = "Gene2")
+
+```
+
