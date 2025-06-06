@@ -1,0 +1,87 @@
+---
+title: "Clustering Analysis Vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Clustering Analysis Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(GeneClustR)
+library(ggplot2)
+library(plotly)
+library(cluster)
+library(factoextra)
+```
+
+This vignette shows how to determine the optimal number of clusters and how to apply different clustering algorithms on pre-processed gene expression data.
+
+First of all, let's build a 'simulated mtrix' in order to show the functionality of this block.
+
+```{r}
+set.seed(123)
+mat <- matrix(rnorm(300), nrow = 30, ncol = 10)
+rownames(mat) <- paste0("Gene", 1:30)
+colnames(mat) <- paste0("Sample", 1:10)
+
+# Preprocessing
+mat_prep <- preprocess(mat, normalize = TRUE, method = "log")
+
+# Rimuovi righe con valori non finiti (Inf, -Inf, NA, NaN)
+mat_prep <- mat_prep[apply(mat_prep, 1, function(x) all(is.finite(x))), ]
+```
+
+Determination of the number of clusters:
+
+Elbow Method, the default one, require a matrix/dataframe in input and the desired number of clusters:
+
+```{r}
+cluster_number(mat_prep, method = "elbow", max_clusters = 10)
+
+```
+
+Gap Statistics method:
+
+```{r}
+cluster_number(mat_prep, method = "gapstats", max_clusters = 10)
+
+```
+
+Once you have runned the (optional) function, used to have an indication on the 'optimal' cluster number, is time to choose a clustering method used to obtain a list containing useful summary and information and also plots
+
+k-means:
+
+```{r}
+kmeans_res <- clustering(mat_prep, method = "kmeans", centers = 3)
+kmeans_res$plot
+
+```
+
+k-medoids
+
+```{r}
+kmedoids_res <- clustering(mat_prep, method = "kmedoids", centers = 3, metric = "euclidean")
+kmedoids_res$plot
+
+```
+
+hierarchical clustering
+
+```{r}
+hclust_res <- clustering(mat_prep, method = "hierarchical", centers = 3)
+hclust_res$plot  # PCA view
+hclust_res$dendrogram  # Dendrogramma
+
+```
+
+DBSCAN
+
+```{r}
+# eps e minpts vanno trovati tramite sperimentazione (es. kNNdistplot)
+dbscan_res <- clustering(mat_prep, method = "DBSCAN", eps = 1, minpts = 2)
+dbscan_res$plot
+
+```
+

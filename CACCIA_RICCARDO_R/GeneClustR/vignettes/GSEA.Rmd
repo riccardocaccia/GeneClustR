@@ -1,0 +1,62 @@
+---
+title: "Gene Set Enrichment Analysis (GSEA)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gene Set Enrichment Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(GeneClustR)
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(limma)
+library(ggplot2)
+```
+This vignette shows how to perform a GSEA (Gene Set Enrichment Analysis) with the function gsea_analysis(). Two modes are supported:Without conditions: analysis based on the average gene expression.With conditions: differential analysis between two groups.Data simulationFor simplicity, we simulate data with ENSEMBL IDs and two experimental groups.
+```{r}
+set.seed(123)
+
+# Let's simulate expression data for 100 genes and 10 samples
+genes <- paste0("ENSG", sprintf("%011d", 1:100))
+samples <- paste0("Sample", 1:10)
+mat <- matrix(rnorm(1000), nrow = 100, dimnames = list(genes, samples))
+
+# preprocessing
+mat <- preprocess(mat, normalize = TRUE, method = "log")
+
+# groups labels
+groups <- rep(c("A", "B"), each = 5)
+```
+
+GSEA without conditions
+
+```{r}
+gsea_res_no <- gsea_analysis(mat, keyType = "ENSEMBL", condition = "no")
+gsea_res_no$plot
+
+```
+
+GSEA with conditions
+
+```{r}
+gsea_res_cond <- gsea_analysis(mat, keyType = "ENSEMBL", condition = "yes", groups = groups)
+
+if (!is.null(gsea_res_cond$plot)) {
+  gsea_res_cond$plot
+} else {
+  cat("No significantly enriched GO term found.")
+}
+
+```
+
+Results exploration
+
+```{r}
+# Firsts lines result visualization
+head(gsea_res_cond$gsea@result)
+
+```
+

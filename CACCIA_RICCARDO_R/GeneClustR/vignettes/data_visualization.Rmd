@@ -1,0 +1,55 @@
+---
+title: "Clustering results visualization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Visualizzazione dei risultati di clustering}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(GeneClustR)
+```
+
+```{r}
+# Simulate genic expression matrix 
+set.seed(123)
+data_matrix <- matrix(rnorm(200), nrow = 20, ncol = 10)
+rownames(data_matrix) <- paste0("Gene", 1:20)
+
+```
+
+```{r}
+# Kmeans for 3 clusters
+clustering_result <- clustering(data_matrix, method = "kmeans", centers = 3)
+```
+
+```{r}
+# 1. Interactive plot visualization (PCA)
+clustering_result$plot
+
+```
+
+```{r}
+# 2. PCA visualization (dati)
+head(clustering_result$pca_result)
+
+```
+
+```{r}
+# 3. Cluster dimension summary
+clustering_result$cluster_information
+
+```
+
+```{r}
+# 4. Dendrogram (only hierarchical clustering)
+# clustering_result$dendrogram
+```
+
+```{r}
+# 5. Assignment cluster
+clustering_result$clusters
+```
+

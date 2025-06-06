@@ -1,0 +1,119 @@
+---
+title: "Preprocessing dei dati di espressione genica"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Preprocessing dei dati di espressione genica}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(GeneClustR)
+library(Biobase)
+library(sva)
+```
+
+In questa vignetta mostriamo come preprocessare una matrice di espressione genica o un oggetto ExpressionSet usando la funzione preprocess() del pacchetto
+GeneClustR.
+
+```{r}
+# Simuliamo una matrice di espressione
+set.seed(42)
+data_matrix <- matrix(rnorm(1000, mean = 100, sd = 20), nrow = 100, ncol = 10)
+data_matrix[data_matrix <= 0] <- 1e-3
+rownames(data_matrix) <- paste0("Gene", 1:100)
+
+# Preprocessing log
+preprocessed_log <- preprocess(data_matrix, normalize = TRUE, method = "log")
+
+# Preprocessing quantile
+preprocessed_quantile <- preprocess(data_matrix, normalize = TRUE, method = "quantile")
+
+# Visualizzazione
+head(preprocessed_log[, 1:5])
+
+```
+
+
+matrix 
+
+```{r}
+# Simuliamo una matrice di espressione
+set.seed(42)
+data_matrix <- matrix(rnorm(1000, mean = 100, sd = 20), nrow = 100, ncol = 10)
+data_matrix[data_matrix <= 0] <- 1e-3
+rownames(data_matrix) <- paste0("Gene", 1:100)
+
+# Preprocessing log
+preprocessed_log <- preprocess(data_matrix, normalize = TRUE, method = "log")
+
+# Preprocessing quantile
+preprocessed_quantile <- preprocess(data_matrix, normalize = TRUE, method = "quantile")
+
+# Visualizzazione
+head(preprocessed_log[, 1:5])
+
+```
+
+batch correction
+
+
+```{r}
+# Simuliamo dati con batch
+batch_vector <- rep(c("A", "B"), length.out = ncol(data_matrix))
+
+# Preprocessing con batch effect
+preprocessed_batch <- preprocess(data_matrix, normalize = TRUE, method = "log",
+                                 batch_effect = TRUE, batch = batch_vector)
+
+```
+
+
+
+<!-- expression set -->
+
+<!-- ```{r} -->
+<!-- # Ricrea data_matrix se è vuota (es. dopo preprocessing fallito) -->
+<!-- if (is.null(dim(data_matrix)) || any(dim(data_matrix) == 0)) { -->
+<!--   data_matrix <- matrix(rnorm(1000, mean = 100, sd = 20), nrow = 100, ncol = 10) -->
+<!--   data_matrix[data_matrix <= 0] <- 1e-3 -->
+<!--   rownames(data_matrix) <- paste0("Gene", 1:100) -->
+<!--   colnames(data_matrix) <- paste0("Sample", 1:10) -->
+<!-- } -->
+
+<!-- # Costruisci batch_vector -->
+<!-- batch_vector <- rep(c("A", "B"), length.out = ncol(data_matrix)) -->
+
+<!-- # Costruisci pdata solo se le dimensioni sono corrette -->
+<!-- if (ncol(data_matrix) != length(batch_vector)) { -->
+<!--   stop("batch_vector length and data_matrix columns don't match.") -->
+<!-- } -->
+
+<!-- pdata <- data.frame( -->
+<!--   sample = colnames(data_matrix), -->
+<!--   batch = batch_vector, -->
+<!--   row.names = colnames(data_matrix) -->
+<!-- ) -->
+
+<!-- # Costruisci ExpressionSet -->
+<!-- pheno_data <- new("AnnotatedDataFrame", data = pdata) -->
+<!-- eset <- ExpressionSet(assayData = data_matrix, phenoData = pheno_data) -->
+
+<!-- # Esegui preprocess -->
+<!-- eset_preprocessed <- tryCatch({ -->
+<!--   preprocess(eset, normalize = TRUE, method = "quantile", batch_effect = TRUE) -->
+<!-- }, error = function(e) { -->
+<!--   message("Errore nel preprocessing: ", e$message) -->
+<!--   NULL -->
+<!-- }) -->
+
+<!-- # Mostra un estratto solo se l'elaborazione è riuscita -->
+<!-- if (!is.null(eset_preprocessed)) { -->
+<!--   Biobase::exprs(eset_preprocessed)[1:5, 1:5] -->
+<!-- } else { -->
+<!--   message("Preprocessing fallito, non è possibile mostrare l'output.") -->
+<!-- } -->
+
+<!-- ``` -->
+

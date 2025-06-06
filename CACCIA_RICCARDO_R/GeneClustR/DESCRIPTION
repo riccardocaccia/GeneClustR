@@ -1,0 +1,34 @@
+Package: GeneClustR
+Type: Package
+Title: Gene expression and clustering analysis
+Version: 0.1.0
+Authors@R: 
+    person("Riccardo", "Caccia", 
+    email = "riccardocaccia0@gmail.com", 
+    role = c("aut", "cre"))
+Description: Provides a set of functions for gene expression analysis, clustering methods, and gene set enrichment analysis. Includes tools for visualizing gene expression correlations, performing clustering with multiple methods, and enriching gene sets based on biological pathways. Designed for use in genomic studies and bioinformatics.
+License: GPL-3
+Encoding: UTF-8
+Imports:
+    cluster (>= 2.1.0),
+    clusterProfiler (>= 4.2.0),
+    factoextra (>= 1.0.7),
+    ggplot2 (>= 3.3.5),
+    limma (>= 3.48.0),
+    org.Hs.eg.db (>= 3.13.0),
+    plotly (>= 4.9.0),
+    sva (>= 3.42.0),
+    dbscan (>= 1.1.8),
+    stats,
+    methods
+Suggests:
+    knitr,
+    rmarkdown,
+    BiocStyle,
+    testthat
+VignetteBuilder: knitr
+biocViews: Clustering, GeneExpression, RNASeq, Software
+URL: https://github.com/riccardocaccia/GeneClustR
+BugReports: https://github.com/riccardocaccia/GeneClustR/issues
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3
